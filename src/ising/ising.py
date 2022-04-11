@@ -1,3 +1,4 @@
+# 100 x 100 Ising model. 100,000 Monte Carlo steps
 # recording in animation.mp4
 # animates only 1% of all steps
 
