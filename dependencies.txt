@@ -1,6 +1,13 @@
 python: 3.10.1
 
----> Libraries <---
+---> inbuilt libraries <---
+itertools
+math
+os
+pickle
+random
+
+---> 3rd party libraries <---
 matplotlib: 3.5.1
 numba: 0.55.0
 numpy: 1.21.5
