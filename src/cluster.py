@@ -2,12 +2,12 @@
 # Generates a time series data of number of clusters of each size, for every year
 
 from matplotlib import pyplot as plt
-from numpy import array, zeros
-from pickle import dump, load
-import os
+from numpy import zeros
+
+from file_manager import load_automaton_data, save_cluster_data
 
 
-def cluster(lattice):
+def cluster_lattice(lattice, trim=True):
     """ Calculates number of clusters of each size, in the given lattce """
     n = len(lattice)
     cluster_sizes = zeros((n * n + 1), dtype=(int))
@@ -27,8 +27,8 @@ def cluster(lattice):
 
                 while len(stack) > 0:
                     i, j = stack.pop()
-                    von_neumann_neighbours = [(i - 1, j), (i + 1, j), (i, j - 1),
-                                            (i, j + 1)]
+                    von_neumann_neighbours = [(i - 1, j), (i + 1, j),
+                                              (i, j - 1), (i, j + 1)]
 
                     for i, j in von_neumann_neighbours:
                         if 0 <= i < n and 0 <= j < n:
@@ -38,43 +38,16 @@ def cluster(lattice):
                                 current_cluster_size += 1
                 cluster_sizes[current_cluster_size] += 1
 
-    return cluster_sizes
+    if trim:
+        max_cluster_size = -1
+        for i in range(n * n, 0, -1):
+            if cluster_sizes[i] > 0:
+                max_cluster_size = i
+                break
 
-
-def check_automaton_data():
-    """ Checks how many simulation files are present in automaton_data """
-    current_path = os.path.dirname(__file__)
-    files_list = os.listdir(os.path.join(current_path, "automaton_data"))
-
-    num_automaton_simulations = 0
-    for file_name in files_list:
-        if file_name.startswith("simulation_") and file_name.endswith(".pkl"):
-            num_automaton_simulations += 1
-
-    return num_automaton_simulations
-
-
-def load_automaton_data(num_file):
-    """ Loads the data from the simulation file with the given number """
-    num_simulations = check_automaton_data()
-    if num_file >= num_simulations:
-        raise ValueError("Invalid simulation file number")
-
-    current_path = os.path.dirname(__file__)
-    file_name = os.path.join(current_path, "automaton_data",
-                             "simulation_{}.pkl".format(num_file))
-
-    with open(file_name, "rb") as file:
-        return load(file)
-
-
-def save_cluster_data(cluster_sizes_record, simulation_index):
-    """ Saves the data of number of clusters of each size, for every year """
-    current_path = os.path.dirname(__file__)
-    file_name = os.path.join(current_path, "cluster_data",
-                             "cluster_data_{}.pkl".format(simulation_index))
-
-    dump(array(cluster_sizes_record, dtype=int), open(file_name, 'wb'))
+        return cluster_sizes[:max_cluster_size + 1]
+    else:
+        return cluster_sizes
 
 
 if __name__ == '__main__':
@@ -86,16 +59,6 @@ if __name__ == '__main__':
 
     for i, lattice in enumerate(lattice_record):
         print("Lattice {}".format(i))
-        cluster_sizes_record.append(cluster(lattice))
+        cluster_sizes_record.append(cluster_lattice(lattice))
 
     save_cluster_data(cluster_sizes_record, simulation_index)
-
-    # lattice = [
-    #     [0, 0, 0, 0, 1],
-    #     [0, 1, 1, 0, 0],
-    #     [0, 1, 0, 1, 0],
-    #     [0, 0, 1, 1, 1],
-    #     [0, 0, 0, 0, 0]
-    # ]
-
-    # print(cluster(lattice))

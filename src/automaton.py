@@ -2,15 +2,15 @@
 # Shows animation
 # Saves data in automaton_data
 
+from concurrent.futures import ThreadPoolExecutor
 from itertools import product
 from math import sqrt
 from numba import njit
-from numpy import array, copy, sum, zeros
+from numpy import copy, sum, zeros
 from matplotlib import pyplot as plt
-from matplotlib.animation import FuncAnimation
-import os
-from pickle import dump
 from random import random
+
+from file_manager import save_automaton_data
 
 
 @njit(fastmath=True, nogil=False)
@@ -45,7 +45,7 @@ def get_density(lattice, i, j):
     for a in range(i - r_influence, i + r_influence + 1):
         for b in range(j - r_influence, j + r_influence + 1):
             if 0 < a < n and 0 < b < n and (i - a) ** 2 + (j - b) ** 2 < r_influence ** 2:
-                weightage_term = 1 - get_distance(i, j, a, b) / k
+                weightage_term = 1 - get_distance(i, j, a, b) / immediacy
                 density += weightage_term * lattice[a, b]
                 normalization += weightage_term
     return density / normalization
@@ -72,74 +72,49 @@ def get_forest_cover(rainfall):
     return slope * rainfall + intercept
 
 
-def save_automaton_data(lattice_record):
-    """ Saves the entire simulation data in a pickle file under automaton_data """
-    current_path = os.path.dirname(__file__)
-    files_list = os.listdir(os.path.join(current_path, "automaton_data"))
-
-    num_automaton_simulations = 0
-    for file_name in files_list:
-        if file_name.startswith("simulation_") and file_name.endswith(".pkl"):
-            num_automaton_simulations += 1
-
-    file_name = 'simulation_{}.pkl'.format(num_automaton_simulations)
-    path_name = os.path.join(current_path, 'automaton_data', file_name)
-    dump(array(lattice_record, dtype=bool), open(path_name, 'wb'))
-
-
-def animate(i):
-    """" Animates a given frame (i) of the simulation """
-    im.set_array(lattice_record[i])
-    return [im]
-
-
-if __name__ == '__main__':
-    #############
-    # CONSTANTS #
-    #############
-    n = 500  # dimensions of lattice
-    mc_steps = 200  # in years
-    mc_fraction = 0.2  # 20% of the cells are updated in every step
-    rainfall = 500  # in mm
-    f_carrying = get_forest_cover(rainfall)
-    r_influence = 5  # radius of influence
-    k = 24  # measure of decrease in weightage of neighbours
-
-    ###########
-    # LATTICE #
-    ###########
+def simulate(simulation_index):
     lattice = make_initial_lattice(n)
     lattice_record = []
 
-    ##############
-    # SIMULATION #
-    ##############
-    print("Compiling functions (will take a few seconds) ...")
     for step in range(mc_steps):
-        print(f"Year {step}")
+        if simulation_index == num_simulations - 1:
+            print(f"{round(step * 100 /mc_steps, 2)} %", end="\r")
         mc_step(lattice)
         lattice_record.append(copy(lattice))
 
-    save_automaton_data(lattice_record)
+    return lattice_record
 
-    #############
-    # ANIMATION #
-    #############
-    fig = plt.figure()
-    im = plt.imshow(lattice_record[0])
-    num_frames = len(lattice_record)
-    animate = FuncAnimation(fig,
-                            animate,
-                            frames=num_frames,
-                            interval=50,
-                            repeat=False)
-    plt.show()
 
-    forest_cover = [sum(lattice) / (n * n) for lattice in lattice_record]
-    plt.title("Change of forest cover with time")
-    plt.xlabel("Time (years)")
-    plt.ylabel("Forest cover")
-    plt.plot(range(num_frames), forest_cover)
-    plt.plot(range(num_frames), [f_carrying] * num_frames)
-    plt.legend(["Forest cover", "Carrying capacity"])
-    plt.show()
+if __name__ == '__main__':
+    show_trajectory = False
+
+    # simulation parameters
+    mc_steps = 200
+    mc_fraction = 0.2
+
+    # constants
+    n = 500
+    rainfall = 500
+    f_carrying = get_forest_cover(rainfall)
+    r_influence = 5
+    immediacy = 24
+
+    num_simulations = 5
+
+    with ThreadPoolExecutor(num_simulations) as pool:
+        lattice_records = pool.map(simulate, range(num_simulations))
+
+    for lattice_record in lattice_records:
+        save_automaton_data(lattice_record)
+
+        if show_trajectory:
+            time = list(range(mc_steps))
+            forest_cover = [sum(lattice) / (n * n) for lattice in lattice_record]
+            plt.title(f"Change of forest cover with time (rainfall = {rainfall} mm/year)")
+            plt.xlabel("Time (years)")
+            plt.ylabel("Forest cover")
+            plt.plot(time, forest_cover)
+            plt.plot(time, [f_carrying] * len(time))
+            plt.legend(["Forest cover", "Carrying capacity"])
+            plt.show()
+        
