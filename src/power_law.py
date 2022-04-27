@@ -1,11 +1,12 @@
 # Averages the final result from an ensemble for simulations
-# and plots a graph that depicts power law clustering
+# and plots a log-log graph that conveys power law clustering
 
 from copy import copy
 from matplotlib import pyplot as plt
 from numpy import around, log, pad, sum, zeros
 
-from cluster import cluster_lattice, load_automaton_data
+from cluster import cluster_lattice
+from file_manager import load_automaton_data
 from linear_regression import perform_linear_regression
 
 
@@ -44,14 +45,14 @@ def trim(y):
 
 if __name__ == '__main__':
     # simulations that need to be considered
-    simulation_indices = list(range(30, 35))
+    simulation_indices = list(range(20, 25))
     ensemble_probabilities = []
-    
-    for simulation_index in simulation_indices:
-        print(f"Calculating probabilities of simulation {simulation_index}")
-        ensemble_probabilities.append(get_probabilities(simulation_index))
 
-    print("Averaging results")
+    for simulation_index in simulation_indices:
+        print("Simulation {} being processed".format(simulation_index))
+        probabilities = get_probabilities(simulation_index)
+        ensemble_probabilities.append(probabilities)
+
     max_length = max([len(probabilities) for probabilities in ensemble_probabilities])
     averaged_probability = zeros(max_length, dtype=float)
 
@@ -61,11 +62,9 @@ if __name__ == '__main__':
 
     averaged_probability /= len(ensemble_probabilities)
 
-    print("Converting to Log-Log scale")
     log_probabilities = trim(log(probabilities))
     log_areas = log(range(1, len(log_probabilities) + 1))
 
-    print("Fitting power law")
     beta, c, r_squared = fit_power_law(log_areas, log_probabilities)
     beta *= -1
     print(f"Beta: {beta}")

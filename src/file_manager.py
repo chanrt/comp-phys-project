@@ -45,7 +45,7 @@ def load_automaton_data(num_file):
 
 
 def save_cluster_data(cluster_sizes_record, simulation_index):
-    """ Saves the data of number of clusters of each size, for every year """
+    """ Saves periodic time series data about number of clusters of each size """
     current_path = os.path.dirname(__file__)
     file_name = os.path.join(current_path, "cluster_data",
                              "cluster_data_{}.pkl".format(simulation_index))

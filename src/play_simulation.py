@@ -8,6 +8,7 @@ def animate(i):
     return [im]
 
 if __name__ == '__main__':
+    # simulation from automaton_data that needs to be played
     simulation_index = int(input("Enter simulation index: "))
     lattice_record = load_automaton_data(simulation_index)
     num_frames = len(lattice_record)

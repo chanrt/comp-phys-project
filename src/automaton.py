@@ -1,6 +1,5 @@
-# Simulates the vegetation automaton
-# Shows animation
-# Saves data in automaton_data
+# Parallely simulates the vegetation automaton
+# And stores the entire data inside automaton_data folder
 
 from concurrent.futures import ThreadPoolExecutor
 from itertools import product
@@ -51,7 +50,7 @@ def get_density(lattice, i, j):
     return density / normalization
 
 
-@njit
+@njit(fastmath=True, nogil=True)
 def get_distance(i, j, a, b):
     """ Calculates the distance between two cells at locations (i, j) and (a, b) """
     return sqrt((i - a)**2 + (j - b)**2)
@@ -73,6 +72,7 @@ def get_forest_cover(rainfall):
 
 
 def simulate(simulation_index):
+    """ Simulates the vegetation automaton """
     lattice = make_initial_lattice(n)
     lattice_record = []
 
@@ -94,14 +94,14 @@ if __name__ == '__main__':
 
     # constants
     n = 500
-    rainfall = 500
+    rainfall = 400
     f_carrying = get_forest_cover(rainfall)
     r_influence = 5
-    immediacy = 24
+    immediacy = 36
 
     num_simulations = 5
 
-    with ThreadPoolExecutor(num_simulations) as pool:
+    with ThreadPoolExecutor(7) as pool:
         lattice_records = pool.map(simulate, range(num_simulations))
 
     for lattice_record in lattice_records:
