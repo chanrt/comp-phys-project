@@ -9,7 +9,7 @@ from numpy import copy, sum, zeros
 from matplotlib import pyplot as plt
 from random import random
 
-from file_manager import save_automaton_data
+from data_manager import save_automaton_data
 
 
 @njit(fastmath=True, nogil=False)
@@ -97,7 +97,7 @@ if __name__ == '__main__':
     rainfall = 400
     f_carrying = get_forest_cover(rainfall)
     r_influence = 5
-    immediacy = 36
+    immediacy = 24
 
     num_simulations = 5
 

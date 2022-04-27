@@ -166,7 +166,9 @@ def cluster_statistics_vs_immediacy():
 def immediacy_variation():
     """ Variation of power-law exponent with immediacy (results from automaton simulations) """
     # Result:
-
+    # m: -0.008666666666666663
+    # c: 2.146
+    # r_squared: 0.4019024970273477
 
     # this data was obtained from the fitting parameters of the graphs under observations/immediacy_variation
     # fit was performed by fit_power_law function of power_law_graph.py
@@ -188,4 +190,10 @@ def immediacy_variation():
 
 
 if __name__ == '__main__':
+    rainfall_vs_forest_cover()
+    cluster_statistics_vs_rainfall()
+    rainfall_variation()
+    cluster_statistics_vs_radius()
+    radius_variation()
+    cluster_statistics_vs_immediacy()
     immediacy_variation()

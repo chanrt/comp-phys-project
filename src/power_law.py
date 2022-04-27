@@ -6,7 +6,7 @@ from matplotlib import pyplot as plt
 from numpy import around, log, pad, sum, zeros
 
 from cluster import cluster_lattice
-from file_manager import load_automaton_data
+from data_manager import load_automaton_data
 from linear_regression import perform_linear_regression
 
 
@@ -16,10 +16,10 @@ def fit_power_law(log_area, log_prob):
     return beta, c, r_squared
 
 
-def get_probabilities(simulation_index):
+def get_probabilities(simulation_index, time_step = -1):
     """ Returns an array such that the i^th element is the probability of that any cluster has area greater than or equal to i """
     lattice_record = load_automaton_data(simulation_index)
-    final_cluster_sizes = cluster_lattice(lattice_record[-1], trim=True)
+    final_cluster_sizes = cluster_lattice(lattice_record[time_step], trim=True)
     cumulative_cluster_sizes = copy(final_cluster_sizes[1:])
 
     for i in range(len(cumulative_cluster_sizes)):
@@ -30,7 +30,7 @@ def get_probabilities(simulation_index):
     return probabilities
 
 
-def trim(y):
+def trim_log_probabilities(y):
     """ Trims the last few repetitive elements of log_probabilities """
     last_value = y[-1]
 
@@ -45,11 +45,11 @@ def trim(y):
 
 if __name__ == '__main__':
     # simulations that need to be considered
-    simulation_indices = list(range(20, 25))
+    simulation_indices = list(range(0, 5))
     ensemble_probabilities = []
 
-    for simulation_index in simulation_indices:
-        print("Simulation {} being processed".format(simulation_index))
+    for i, simulation_index in enumerate(simulation_indices):
+        print(f"Lattice {i + 1} / {len(simulation_indices)} being processed")
         probabilities = get_probabilities(simulation_index)
         ensemble_probabilities.append(probabilities)
 
@@ -62,7 +62,7 @@ if __name__ == '__main__':
 
     averaged_probability /= len(ensemble_probabilities)
 
-    log_probabilities = trim(log(probabilities))
+    log_probabilities = trim_log_probabilities(log(probabilities))
     log_areas = log(range(1, len(log_probabilities) + 1))
 
     beta, c, r_squared = fit_power_law(log_areas, log_probabilities)

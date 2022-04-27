@@ -1,7 +1,7 @@
 from math import sqrt
 from numpy import mean
 from cluster import cluster_lattice
-from file_manager import load_automaton_data
+from data_manager import load_automaton_data
 
 
 def obtain_cluster_statistics(lattice):
@@ -9,7 +9,7 @@ def obtain_cluster_statistics(lattice):
     cluster_data = cluster_lattice(lattice, True)
         
     num_clusters = sum(cluster_data[1:])
-    size = len(lattice_records[0])
+    size = len(lattice)
     vegetation_area = (size * size) - cluster_data[0]
     average_cluster_size = vegetation_area / num_clusters
 
@@ -23,14 +23,14 @@ def obtain_cluster_statistics(lattice):
 
 if __name__ == '__main__':
     # simulations that need to be considered
-    simulation_indices = list(range(10, 15))
+    simulation_indices = list(range(0, 5))
 
     num_clusters_list = []
     average_cluster_size_list = []
     sd_list = []
 
-    for simulation_index in simulation_indices:
-        print(f"Processing simulation {simulation_index}")
+    for i, simulation_index in enumerate(simulation_indices):
+        print(f"Lattice {i + 1} / {len(simulation_indices)} being processed")
         
         lattice_records = load_automaton_data(simulation_index)
         num_clusters, average_cluster_size, sd = obtain_cluster_statistics(lattice_records[-1])

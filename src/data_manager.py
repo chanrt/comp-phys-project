@@ -2,6 +2,7 @@ from numpy import array
 from pickle import dump, load
 import os
 
+
 def save_automaton_data(lattice_record):
     """ Saves the entire simulation data in a pickle file under automaton_data """
     current_path = os.path.dirname(__file__)
@@ -42,12 +43,3 @@ def load_automaton_data(num_file):
 
     with open(file_name, "rb") as file:
         return load(file)
-
-
-def save_cluster_data(cluster_sizes_record, simulation_index):
-    """ Saves periodic time series data about number of clusters of each size """
-    current_path = os.path.dirname(__file__)
-    file_name = os.path.join(current_path, "cluster_data",
-                             "cluster_data_{}.pkl".format(simulation_index))
-
-    dump(array(cluster_sizes_record, dtype=int), open(file_name, 'wb'))

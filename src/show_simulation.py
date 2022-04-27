@@ -1,7 +1,7 @@
 from matplotlib import pyplot as plt
 from matplotlib.animation import FuncAnimation
 
-from file_manager import load_automaton_data
+from data_manager import load_automaton_data
 
 def animate(i):
     im.set_array(lattice_record[i])

@@ -1,6 +1,6 @@
 from numpy import zeros
 
-def cluster_lattice(lattice, trim=True):
+def cluster_lattice(lattice, trim=False):
     """ Calculates number of clusters of each size, in the given lattce """
     n = len(lattice)
     cluster_sizes = zeros((n * n + 1), dtype=(int))

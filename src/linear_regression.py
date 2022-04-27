@@ -2,9 +2,12 @@
 # I know that there are inbuilt packages for linear regression
 # I wrote the code myself because we were taught how to do this in this course
 
+from numba import njit
 from numpy import mean, sum
 
+@njit
 def perform_linear_regression(x, y):
+    """ Performs a linear regression on the data """
     x_mean = mean(x)
     y_mean = mean(y)
 
