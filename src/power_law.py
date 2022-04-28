@@ -45,7 +45,7 @@ def trim_log_probabilities(y):
 
 if __name__ == '__main__':
     # simulations that need to be considered
-    simulation_indices = list(range(0, 5))
+    simulation_indices = list(range(0, 10))
     ensemble_probabilities = []
 
     for i, simulation_index in enumerate(simulation_indices):

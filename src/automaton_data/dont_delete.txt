@@ -1,0 +1,2 @@
+automaton.py dumps the simulation results in this folder.
+Deleting this will result in an error.

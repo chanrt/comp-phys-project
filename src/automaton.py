@@ -94,13 +94,14 @@ if __name__ == '__main__':
 
     # constants
     n = 500
-    rainfall = 400
+    rainfall = 500
     f_carrying = get_forest_cover(rainfall)
-    r_influence = 5
+    r_influence = 6
     immediacy = 24
 
-    num_simulations = 5
+    num_simulations = 10
 
+    print("Compiling functions (will take a few seconds ...)")
     with ThreadPoolExecutor(7) as pool:
         lattice_records = pool.map(simulate, range(num_simulations))
 
